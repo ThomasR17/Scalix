@@ -34,8 +34,8 @@ object Scalix extends App{
     println(s"Find movie id=$movieId director's id and name :\n $movieDirector\n")
 
     /*-- Test findMovieDirector*/
-    val actor1= "Éric Judor"
-    val actor2= "Ramzy Bedia"
+    val actor1= FullName("Éric", "Judor")
+    val actor2= FullName("Ramzy", "Bedia")
     val collab: Set[(String, String)] = collaboration(actor1, actor2)
     println(s"Collaboration entre $actor1 et $actor2 Taille ${collab.size}:\n $collab")
   }
@@ -91,12 +91,9 @@ object Scalix extends App{
 
   case class FullName(first:String, last:String)
 
-  def collaboration(actor1: String, actor2: String): Set[(String, String)] = {
-    val name_surname1 = actor1.split(" ")
-    val id_actor_1 = findActorId(name_surname1(0), name_surname1(1))
-
-    val name_surname2 = actor2.split(" ")
-    val id_actor_2 = findActorId(name_surname2(0), name_surname2(1))
+  def collaboration(actor1: FullName, actor2: FullName): Set[(String, String)] = {
+    val id_actor_1 = findActorId(actor1.first, actor1.last)
+    val id_actor_2 = findActorId(actor2.first, actor2.last)
 
     if (id_actor_1.isDefined && id_actor_2.isDefined) {
       //Set([Int,String])
@@ -106,7 +103,6 @@ object Scalix extends App{
       //println(s"Movies 2 de $actor2 Taille ${movies_2.size}: \n$movies_2\n")
 
       val res = movies_1.intersect(movies_2)
-      //println(s"Movies Intersection de $actor1 et $actor2 Taille ${res.size}: $res\n\n")
 
       var director_movie: Set[(String, String)] = Set()
       var tmp : Option[(Int,String)]= None
