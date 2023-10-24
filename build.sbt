@@ -8,4 +8,5 @@ lazy val root = (project in file("."))
   )
 libraryDependencies += "org.json4s" %% "json4s-ast" % "4.0.6"
 libraryDependencies += "org.json4s" %% "json4s-native" % "4.0.6"
+libraryDependencies += "com.lihaoyi" %% "upickle" % "3.0.0"
 

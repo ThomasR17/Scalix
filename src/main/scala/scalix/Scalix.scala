@@ -2,21 +2,22 @@ package scalix
 import scala.io.Source
 import org.json4s.*
 
+import java.io.{File, PrintWriter}
+
 implicit val formats: DefaultFormats.type = DefaultFormats
 
 import org.json4s.native.JsonMethods._
 val api_key = "api_key=097342ccbc3fe2613b6a792085e110d7"
 
 object Scalix extends App{
-  val url = "https://api.themoviedb.org/3/search/person?query=tom-cruise&"+api_key
-  val source = Source.fromURL(url)
-  val contents = source.mkString
+  /*val url = "https://api.themoviedb.org/3/search/person?query=tom-cruise&"+api_key
+  val contents = Source.fromURL(url).mkString
   println("Search Tom Cruise: \n"+contents)
 
   val json = parse(contents)
-  println("Format type Json : \n"+json)
+  println("Format type Json : \n"+json)*/
 
-  println(s"\n -------------STARTING TEST ------------\n")
+  println("\n -------------STARTING TEST ------------\n")
 
   /*-- Test findActorId*/
   val actor_name = "Tom Cruise"
@@ -40,14 +41,22 @@ object Scalix extends App{
     println(s"Collaboration entre $actor1 et $actor2 Taille ${collab.size}:\n $collab")
   }
 
+
   //retourne l'entier identifiant un acteur à partir de son nom et de son prénom
   def findActorId(name: String, surname: String): Option[Int] = {
+    //val fileContents = parse(Source.fromFile(System.getProperty("user.dir")+"/src/main/scala/data/actor$id.json").getLines().mkString)
+
+    /*if(fileContents.snakizeKeys.contains((name+" "+surname)){
+
+    } hello_world*/
+
     val url = s"https://api.themoviedb.org/3/search/person?query=$name+$surname+&$api_key"
     val source = Source.fromURL(url)
     val json = parse(source.mkString)
 
     val request_results = (json \ "results" \ "id").children.head.extractOpt[Int]
-    request_results
+
+    return request_results
   }
 
   //retourne l'ensemble des films dans lequel a tourné cet acteur sous la forme de paires donnant l'identifiant du film et son titre
@@ -76,7 +85,7 @@ object Scalix extends App{
 
     //List[JValue], Director in "crew"
     val crew = (json \ "crew").children
-
+    println(crew)
     var director : Option[(Int,String)] = None
     for (elem <- crew) {
       if ((elem \ "job").extractOpt[String].contains("Director")) {
@@ -90,7 +99,6 @@ object Scalix extends App{
   }
 
   case class FullName(first:String, last:String)
-
   def collaboration(actor1: FullName, actor2: FullName): Set[(String, String)] = {
     val id_actor_1 = findActorId(actor1.first, actor1.last)
     val id_actor_2 = findActorId(actor2.first, actor2.last)
@@ -117,4 +125,5 @@ object Scalix extends App{
     }
     Set()
   }
+
 }
