@@ -19,8 +19,9 @@ object Scalix extends App{
   println(s"\n -------------STARTING TEST ------------\n")
 
   /*-- Test findActorId*/
+  val actor_name = "Tom Cruise"
   val actorFromId = findActorId("Tom", "Cruise")
-  println(s"Find actor id : Tom Cruise :\n $actorFromId\n")
+  println(s"Find $actor_name's id :\n $actorFromId\n")
 
   if (actorFromId.isDefined){
     /*-- Test findActorMovies*/
@@ -28,9 +29,15 @@ object Scalix extends App{
     println(s"Find actor id=$actorFromId movies :\n $actorMoviesFromActorId\n")
 
     /*-- Test findMovieDirector*/
-    val movieId= 149044
+    val movieId= actorMoviesFromActorId.head._1
     val movieDirector = findMovieDirector(movieId)
     println(s"Find movie id=$movieId director's id and name :\n $movieDirector\n")
+
+    /*-- Test findMovieDirector*/
+    val actor1= "Éric Judor"
+    val actor2= "Ramzy Bedia"
+    val collab: Set[(String, String)] = collaboration(actor1, actor2)
+    println(s"Collaboration entre $actor1 et $actor2 Taille ${collab.size}:\n $collab")
   }
 
   //retourne l'entier identifiant un acteur à partir de son nom et de son prénom
@@ -82,9 +89,36 @@ object Scalix extends App{
     director
   }
 
-  case class FullName(fullname:String){}
-  def collaboration(actor1: FullName, actor2: FullName): Set[(String, String)] = {
+  case class FullName(first:String, last:String)
+
+  def collaboration(actor1: String, actor2: String): Set[(String, String)] = {
+    val name_surname1 = actor1.split(" ")
+    val id_actor_1 = findActorId(name_surname1(0), name_surname1(1))
+
+    val name_surname2 = actor2.split(" ")
+    val id_actor_2 = findActorId(name_surname2(0), name_surname2(1))
+
+    if (id_actor_1.isDefined && id_actor_2.isDefined) {
+      //Set([Int,String])
+      val movies_1 = findActorMovies(id_actor_1.get)
+      val movies_2 = findActorMovies(id_actor_2.get)
+      //println(s"Movies 1 de $actor1 Taille ${movies_1.size}: \n$movies_1\n")
+      //println(s"Movies 2 de $actor2 Taille ${movies_2.size}: \n$movies_2\n")
+
+      val res = movies_1.intersect(movies_2)
+      //println(s"Movies Intersection de $actor1 et $actor2 Taille ${res.size}: $res\n\n")
+
+      var director_movie: Set[(String, String)] = Set()
+      var tmp : Option[(Int,String)]= None
+
+      for(m <- res){
+        tmp=findMovieDirector(m._1)
+        if(tmp.isDefined){
+          director_movie+= (tmp.get._2, m._2)
+        }
+      }
+      return director_movie
+    }
     Set()
   }
-
 }
